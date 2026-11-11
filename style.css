@@ -7,3 +7,7 @@
 
 
 .cost-goal{font-size:20px;color:var(--muted);margin:0 0 14px}
+
+#additional-field{margin:20px 0 24px}
+
+#additional-affixes{appearance:textfield;-moz-appearance:textfield}#additional-affixes::-webkit-inner-spin-button,#additional-affixes::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}

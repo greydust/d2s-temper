@@ -8,8 +8,9 @@
 <div class="configuration">
 <div class="tabs" role="group" aria-label="Item rarity"><button data-rarity="unique" class="active">Unique</button><button data-rarity="set">Set</button><button data-rarity="runeword">Runeword</button><button data-rarity="rare">Rare</button></div>
 <div id="catalogue-fields"><label for="slot">EQUIPMENT SLOT</label><select id="slot"></select><label for="item">ITEM</label><div class="item-picker"><div class="item-input"><input id="item" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="item-options" autocomplete="off" placeholder="Search or select an item…"><button id="item-toggle" type="button" aria-label="Show items" tabindex="-1">⌄</button></div><div id="item-options" role="listbox" aria-label="Items" hidden></div></div><p id="item-meta" class="hint"></p></div>
-<div id="rare-fields" hidden><label for="rare-count">NUMBER OF TEMPERABLE AFFIXES</label><select id="rare-count"><option selected>3</option><option>4</option><option>5</option><option>6</option></select><p class="hint">Target one chosen affix.</p></div>
+<div id="rare-fields" hidden><label for="rare-count">NUMBER OF TEMPERABLE AFFIXES</label><select id="rare-count"><option selected>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select><p class="hint">Target one chosen affix.</p></div>
 
+<div id="additional-field" hidden><label for="additional-affixes">ADDITIONAL AFFIXES</label><input id="additional-affixes" type="number" min="0" max="63" step="1" value="0" inputmode="numeric"></div>
 <div id="affix-field"><label for="affix">AFFIX TO TEMPER</label><select id="affix"></select></div>
 <div class="target-row"><div><label for="target">TARGET ROLLS (AT LEAST)</label><select id="target"></select></div></div>
 <p id="error" role="alert"></p>

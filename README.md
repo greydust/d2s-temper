@@ -25,14 +25,14 @@ The repository already points to `greydust/d2s-temper`. The included `.github/wo
 3. Run **Deploy to GitHub Pages** under Actions, or push to `main` again.
 4. The deployment job provides the public URL, normally `https://greydust.github.io/d2s-temper/`.
 
-All asset links are relative, so a repository subpath works. Only index.html, style.css, app.js, solver.js and data/items.json are deployed. Game files, research, development scripts and tests are not part of the Pages artifact. Google Fonts is optional typography; system fallbacks work without it.
+All asset links are relative, so a repository subpath works. Only index.html, style.css, app.js, solver.js, item-model.js and data/items.json are deployed. Game files, research, development scripts and tests are not part of the Pages artifact. Google Fonts is optional typography; system fallbacks work without it.
 
 Enable GitHub Pages with GitHub Actions as the deployment source before the first deployment.
 
 ## What it does
 
 - Unique, set and runeword item selectors grouped by equipment slot; a searchable item dropdown and eligible affix selection.
-- Rare items with 3–6 temperable affixes; target one selected affix without needing its name.
+- Rare items with 3–10 temperable affixes; target one selected affix without needing its name.
 - Targets of 1–10 added rolls on one chosen affix; results update automatically after selection.
 - Exact minimum-expected-cost temper/clean policy and readable reset checkpoints.
 - Browser-only saved plans that can be restored or deleted.
@@ -82,3 +82,15 @@ node scripts/extract-items.cjs "$env:APPDATA/D2 Survivors/d2" "D:/D2 Survivors/r
 ```
 
 The extractor reads the ASAR without modifying the installation. It evaluates isolated property-roll/line-eligibility helpers in a VM, then writes only the compact catalogue. Its helper names are tied to this minified build; review the extractor and mechanics after a game update. No save files are read.
+
+## Additional affixes
+
+The extractor flags 47 runeword/slot combinations with at least one eligible base. Eligibility uses the installed base-type hierarchy, runeword allowed/excluded types, socket capacity, staffMod types, and base automod types. Unique and set constructors never roll random staff skills or base automods, so they have no additional-affix input.
+
+Eligible bases include Barbarian helms, Druid pelts, Paladin scepters, Necromancer wands/heads, Sorceress staves/orbs, eligible Assassin claws, Amazon weapons and Paladin shields. Some types cannot hold the sockets needed by any current runeword; the extractor filters these out. Paladin class helms are not a base category in the installed game.
+
+The optional additional count defaults to zero whenever an item changes. Count extra **temperable selection entries**, not skill levels or already-listed item properties. For example, Paladin-shield resistances are four separate selection entries in this client, despite the combined tooltip. For rares, choose the full temperable count (3–10) directly; there is no separate additional-affix input.
+
+For eligible runewords, the displayed total and optimizer both use catalogue lines plus additional affixes (up to 64 total). Each extra line is individually selectable as “Additional affix 1”, etc. Saved plans retain and restore the count and the target selection. The cost still covers all ten successful tempers before Hellforge.
+
+Source: installed client functions cY/hZ (rare/runeword bonuses), eZ/iZ (fixed unique/set properties), BJ/lK (staff skills), IJ/FJ (automods), and uq (tempering groups), corroborated by the developer's Items wiki under Rarities.

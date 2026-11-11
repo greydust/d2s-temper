@@ -1,4 +1,5 @@
 import {solve} from './solver.js';
+import {itemConfiguration} from './item-model.js';
 const $=id=>document.getElementById(id);
 const storageKey='d2s-temper-ledger-v1';
 const number=n=>new Intl.NumberFormat(undefined,{maximumFractionDigits:2}).format(n);
@@ -31,30 +32,44 @@ function items(){
   else{delete $('item').dataset.index;$('item').value='';closeItems();itemChanged();}
 }
 function itemChanged(){
-  const item=selected();
+  const item=selected();$('additional-affixes').value='0';$('additional-field').hidden=true;
   if(!item){$('item-meta').textContent='';options($('affix'),[]);result=null;snapshot=null;document.querySelector('.results').hidden=true;return;}
-  $('item-meta').textContent=item.lines.length+' temperable line'+(item.lines.length===1?'':'s');
-  options($('affix'),item.lines.map((l,i)=>[i,l.label]));calculate();
+  updateAffixes(false);calculate();
+}
+function configuration(){
+  const item=rarity==='rare'?{lines:Array.from({length:Number($('rare-count').value)},()=>({label:'Chosen affix'})),extraAffixBases:[]}:selected();
+  const additional=rarity==='rare'?0:Number($('additional-affixes').value);
+  if(rarity!=='rare'&&$('additional-affixes').value.trim()==='')throw new Error('Enter the number of additional affixes (0 if none).');
+  return itemConfiguration(item,additional);
+}
+function updateAffixes(preserve=true){
+  const previous=preserve?$('affix').value:'',config=configuration();
+  $('additional-field').hidden=!config.eligible;$('additional-affixes').max=config.maxAdditional;
+  if(rarity!=='rare'){
+    $('item-meta').textContent=config.lineCount+' temperable line'+(config.lineCount===1?'':'s');
+    options($('affix'),config.affixes.map((label,i)=>[i,label]));
+    if(previous!==''&&config.affixes[Number(previous)]!==undefined)$('affix').value=previous;
+  }
 }
 function setRarity(value){
   rarity=value;closeItems();
   document.querySelectorAll('[data-rarity]').forEach(b=>{const active=b.dataset.rarity===value;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
   $('catalogue-fields').hidden=value==='rare';$('rare-fields').hidden=value!=='rare';$('affix-field').hidden=value==='rare';
-  if(value==='rare')calculate();else slots();
+  if(value==='rare'){$('additional-affixes').value='0';updateAffixes();calculate();}else slots();
 }
 function calculate(){
   try{
     const item=selected();
-    const lines=rarity==='rare'?Number($('rare-count').value):item?.lines.length;
+    const lines=configuration().lineCount;
     const target=lines===1?10:Number($('target').value);
     $('affix-field').hidden=rarity==='rare'||lines===1;
     document.querySelector('.target-row').hidden=lines===1;
     if(rarity!=='rare'&&!item)throw new Error('Select an item.');
     result=solve(lines,target);document.querySelector('.results').hidden=false;
-    snapshot={rarity,slot:$('slot').value,affixIndex:$('affix').value,lines,target,name:rarity==='rare'?`Rare item · ${$('rare-count').value} affixes`:item.name,affix:rarity==='rare'?'Chosen affix':item.lines[Number($('affix').value)].label,rareCount:$('rare-count').value};
+    snapshot={additionalAffixes:rarity==='rare'?0:Number($('additional-affixes').value),rarity,slot:$('slot').value,affixIndex:$('affix').value,lines,target,name:rarity==='rare'?`Rare item · ${$('rare-count').value} affixes`:item.name,affix:rarity==='rare'?'Chosen affix':$('affix').selectedOptions[0].textContent,rareCount:$('rare-count').value};
     $('cost').textContent=number(result.cost);
     $('error').textContent='';$('save-message').textContent='';renderCheckpoints();
-  }catch(e){$('error').textContent=e.message;}
+  }catch(e){$('error').textContent=e.message;result=null;snapshot=null;document.querySelector('.results').hidden=true;}
 }
 function renderCheckpoints(){
   const rows=[];let last=0;
@@ -108,18 +123,25 @@ $('saved-plans').addEventListener('click',e=>{
   if(del){persist(records.filter(r=>r.id!==del.dataset.delete));return;}
   if(!open)return;
   const r=records.find(x=>x.id===open.dataset.open);setRarity(r.rarity);
-  if(r.rarity==='rare')$('rare-count').value=r.rareCount||r.lines;
+  if(r.rarity==='rare'){
+    if(r.lines<3||r.lines>10){$('error').textContent='This saved rare plan has an affix count outside 3–10.';return;}
+    $('rare-count').value=r.lines;
+  }
   else{
     $('slot').value=r.slot;items();
     const idx=database.items.findIndex(x=>x.name===r.name&&x.slot===r.slot&&x.rarity===r.rarity);
     if(idx<0){$('error').textContent='Saved item not found.';return;}
-    chooseItem(idx);$('affix').value=r.affixIndex;
+    chooseItem(idx);
   }
+  $('additional-affixes').value=r.rarity==='rare'?0:r.additionalAffixes??0;updateAffixes();
+  if(r.rarity!=='rare')$('affix').value=r.affixIndex;
   $('target').value=r.target;calculate();$('planner').scrollIntoView({behavior:'smooth'});
 });
 for(const b of document.querySelectorAll('[data-rarity]'))b.addEventListener('click',()=>setRarity(b.dataset.rarity));
 $('slot').addEventListener('change',items);
-for(const id of ['rare-count','affix','target'])$(id).addEventListener('change',calculate);
+$('rare-count').addEventListener('change',()=>{updateAffixes();calculate();});
+for(const id of ['affix','target'])$(id).addEventListener('change',calculate);
+$('additional-affixes').addEventListener('input',()=>{try{updateAffixes();calculate();}catch(e){$('error').textContent=e.message;result=null;snapshot=null;document.querySelector('.results').hidden=true;}});
 options($('target'),Array.from({length:10},(_,i)=>[i+1,`${i+1} roll${i?'s':''}`]));$('target').value='4';
 try{
   const response=await fetch('./data/items.json');if(!response.ok)throw new Error('Could not load items.');

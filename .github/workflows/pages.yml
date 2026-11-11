@@ -26,7 +26,7 @@ jobs:
       - name: Prepare static site
         run: |
           mkdir -p dist/data
-          cp index.html style.css app.js solver.js dist/
+          cp index.html style.css app.js solver.js item-model.js dist/
           cp data/items.json dist/data/
           touch dist/.nojekyll
       - uses: actions/upload-pages-artifact@v3

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#131512"><title>The Tempering Ledger · D2 Survivors</title><link rel="stylesheet" href="style.css"><script type="module" src="app.js"></script></head>
+<body>
+<header><a class="brand" href="./"><span>D2 SURVIVORS <b>THE TEMPERING LEDGER</b></span></a></header>
+<main>
+<section id="planner" class="workspace">
+<div class="configuration">
+<div class="tabs" role="group" aria-label="Item rarity"><button data-rarity="unique" class="active">Unique</button><button data-rarity="set">Set</button><button data-rarity="runeword">Runeword</button><button data-rarity="rare">Rare</button></div>
+<div id="catalogue-fields"><label for="slot">EQUIPMENT SLOT</label><select id="slot"></select><label for="item">ITEM</label><div class="item-picker"><div class="item-input"><input id="item" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="item-options" autocomplete="off" placeholder="Search or select an item…"><button id="item-toggle" type="button" aria-label="Show items" tabindex="-1">⌄</button></div><div id="item-options" role="listbox" aria-label="Items" hidden></div></div><p id="item-meta" class="hint"></p></div>
+<div id="rare-fields" hidden><label for="rare-count">NUMBER OF TEMPERABLE AFFIXES</label><select id="rare-count"><option selected>3</option><option>4</option><option>5</option><option>6</option></select><p class="hint">Target one chosen affix.</p></div>
+
+<div id="affix-field"><label for="affix">AFFIX TO TEMPER</label><select id="affix"></select></div>
+<div class="target-row"><div><label for="target">TARGET ROLLS (AT LEAST)</label><select id="target"></select></div></div>
+<p id="error" role="alert"></p>
+</div>
+<div class="results" aria-live="polite"><div class="cost"><h2>Expected Burning Essence Cost</h2><p class="cost-goal">To finish 10 tempers</p><span id="cost">—</span></div>
+<div class="strategy-heading"><h3>Reset checkpoints</h3></div><p id="checkpoint-explanation" class="hint">Reset if you have fewer target rolls than listed by that successful temper count.</p>
+<table class="checkpoint-table"><thead><tr><th scope="col">Tempered count</th><th scope="col">Target rolls</th></tr></thead><tbody id="checkpoints"></tbody></table>
+<div class="result-footer"><button id="save">＋ Save this plan</button></div><p id="save-message" role="status"></p></div>
+</section>
+<section class="saved-section" id="saved"><h2>Saved plans</h2><div id="saved-plans"></div></section>
+</main>
+</body></html>
